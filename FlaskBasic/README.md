@@ -1,7 +1,7 @@
-#flashÏûÏ¢ÉÁÏÖ ×Ô¶¨ÖÆ404 form±íµ¥ÑéÖ¤
+# flashæ¶ˆæ¯é—ªç° è‡ªå®šåˆ¶404 formè¡¨å•éªŒè¯
 
 
-##flash
+## flash
 ```
 @app.route('/login/', methods=['POST'])
 def login():
@@ -24,7 +24,7 @@ def login():
 ```
 <div class="alert alert-success"><p class="text-center">{{ get_flashed_messages()[0] }}</p></div>
 ```
-##404
+## 404
 ```
 from flask import abort
 
@@ -33,7 +33,7 @@ abort(404)
 def not_found(e):
     return render_template('404.html')
 ```
-##form±íµ¥
+## formè¡¨å•
 ```
 from flask import Flask, request, render_template, redirect
 from wtforms import Form, StringField, PasswordField, validators, BooleanField, SubmitField
@@ -42,8 +42,8 @@ from wtforms import Form, StringField, PasswordField, validators, BooleanField, 
 class LoginForm(Form):
     username = StringField('username', [validators.data_required()])
     password = PasswordField('password', [validators.data_required()])
-    remember = BooleanField('¼Ç×¡ÎÒ')
-    submit = SubmitField('µÇÂ¼')
+    remember = BooleanField('è®°ä½æˆ‘')
+    submit = SubmitField('ç™»å½•')
 ```
 ```
 @app.route('/', methods=['GET', 'POST'])
@@ -68,10 +68,10 @@ def form():
                 {{ massage }}
                 <br>
             {% endif %}
-        ÓÃ»§£º{{ form.username }}
+        ç”¨æˆ·ï¼š{{ form.username }}
 
         <br>
-        ÃÜÂë£º{{ form.password }}
+        å¯†ç ï¼š{{ form.password }}
             <br>
         {{ form.remember.label }}
         {{ form.remember }}
