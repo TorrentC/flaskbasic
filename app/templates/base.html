@@ -1,0 +1,33 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block content %}
+    <div class="center-block container" style="margin-top: 10px;max-width: 900px;">
+        <div>
+            {% for message in get_flashed_messages() %}
+                <div class="alert alert-warning">
+                    <a href="#" class="close" data-dismiss="alert">
+                        &times;
+                    </a>
+                    {{ message }}
+            </div>
+            {% endfor %}
+
+        </div>
+        {% block page_content %}
+
+        {% endblock %}
+        <div>
+            <p class="text-right">{{ moment(current_time).format('LLL') }}</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+    {{ moment.lang('zh-cn') }}
+{% endblock %}
+
+
+
+

@@ -1,136 +1,213 @@
-ä¸€ä¸ªæœ€ç®€å•çš„flaskç¨‹åº
+## flask-wtf
+¶¨Òå¼òµ¥±íµ¥
 ```
-from flask import Flask
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, Length
 
 
-app = Flask(__name__)
+class NameForm(FlaskForm):
+    name = StringField("What's your name?", validators=[DataRequired()])
+    file = FileField('file upload')
+    submit = SubmitField('submit')
+```
+wtformÖ§³Ö×Ö¶ÎÀàĞÍ
+| ×Ö¶Î	 | ËµÃ÷|
+| ------ | ------ |
+|StringField|ÎÄ±¾×Ö¶Î|
+|TextAreaField	|¶àĞĞÎÄ±¾×Ö¶Î
+|PasswordField|	ÃÜÂëÎÄ±¾×Ö¶Î
+|HiddenField	|Òş²ØÎÄ±¾×Ö¶Î
+|DateField|	ÎÄ±¾×Ö¶Î£¬ÖµÎª datetime.date ¸ñÊ½
+|DateTimeField	|ÎÄ±¾×Ö¶Î£¬Öµdatetime.datetime ¸ñÊ½
+|IntegerField|	ÎÄ±¾×Ö¶Î£¬ÖµÎªÕûÊı
+|DecimalField	|ÎÄ±¾×Ö¶Î£¬ÖµÎª decimal.Decimal
+|FloatField	|ÎÄ±¾×Ö¶Î£¬ÖµÎª¸¡µãÊı
+|BooleanField	|¸´Ñ¡¿ò£¬ÖµÎª True ºÍ False
+|RadioField	|Ò»×éµ¥Ñ¡¿ò
+|SelectField	|ÏÂÀ­ÁĞ±í
+|SelectMultipleField	|ÏÂÀ­ÁĞ±í£¬¿ÉÑ¡Ôñ¶à¸öÖµ
+|FileField	|ÎÄ¼şÉÏ´«×Ö¶Î
+|SubmitField	|±íµ¥Ìá½»°´Å¥
+|FormField	|°Ñ±íµ¥×÷Îª×Ö¶ÎÇ¶ÈëÁíÒ»¸ö±íµ¥
+|FieldList	|Ò»×éÖ¸¶¨ÀàĞÍµÄ×Ö¶Î
 
+wtformÑéÖ¤º¯Êı
+|º¯Êı|ËµÃ÷
+|----|----|
+|Email| ÑéÖ¤µç×ÓÓÊ¼şµØÖ·|
+|EqualTo |±È½ÏÁ½¸ö×Ö¶ÎµÄÖµ£¬³£ÓÃÓÚÒªÇóÊäÈëÁ½´ÎÃÜÂë½øĞĞÈ·ÈÏµÄÇé¿ö
+|IPAddress |ÑéÖ¤IPv4ÍøÂçµØÖ·
+|Length| ÑéÖ¤ÊäÈë×Ö·û´®µÄ³¤¶È
+|NumberRange |ÑéÖ¤ÊäÈëµÄÖµÔÚÊı×Ö·¶Î§ÄÚ
+|Optional |ÎŞÊäÈëÖµÊ±Ìø¹ıÆäËûÑéÖ¤º¯Êı
+|Required| È·±£×Ö¶ÎÖĞÓĞÊı¾İ
+|Regexp |Ê¹ÓÃÕıÔò±í´ïÊ½ÑéÖ¤ÊäÈëÖµ
+|URL|ÑéÖ¤URL
+|AnyOf |È·±£ÊäÈëÖµÔÚ¿ÉÑ¡ÖµÁĞ±íÖĞ
+|NoneOf| È·±£ÊäÈëÖµ²»ÔÚ¿ÉÑ¡ÁĞ±íÖĞ
 
-@app.route('/')
+ÔÚÄ£°åÖĞÊ¹ÓÃ
+```
+<form action="" method="post" role="form">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                {{ form.name.label }}
+                {{ form.name(class='form-control') }}
+                </div>
+                {{ form.submit() }}
+</form>
+
+{% import 'bootstrap/wtf.html' as wtf %}
+{{ wtf.quick_form(form) }}
+```
+ÔÚÊÓÍ¼º¯ÊıÖĞÊ¹ÓÃ
+```
+@app.route('/', methods=['GET', 'POST'])
 def hello():
-    return "<b>Hello world</b>"
-
-
-if __name__ == '__main__':
-    app.run()
+    name = session.get('name')
+    form = NameForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        file = request.files.get('file')
+        file.save(file.filename)
+        session['name'] = name
+        form.name.data = ''
+        return redirect(url_for('hello'))
+    return render_template('index.html', name=name, form=form, current_time=datetime.utcnow())
 ```
-## flaskåŸºç¡€æ“ä½œ
+## FlashÉÁÏÖ
 ```
-from flask import Flask, request, make_response, abort
+{% for message in get_flashed_messages() %}
+  <div class="alert alert-warning">
+   <a href="#" class="close" data-dismiss="alert">
+                        &times;
+    </a>
+                    {{ message }}
+   </div>
+ {% endfor %}
 
-
-app = Flask(__name__)
-
-
-@app.route('/')
-def hello():
-    content = "<h1>Welcome here</h><br><a href='/user'>click</a>"
-    response = make_response(content)
-    response.set_cookie('name', 'Torrent')
-    return response
-
-
-@app.route('/user')
-def user():
-    name = request.cookies.get('name')
-    if name is None:
-        abort(404)
-    return '<b>Hello %s</b>' % name, 400
-
-
-if __name__ == '__main__':
-    app.run()
 ```
-## æ¨¡æ¿çš„ä½¿ç”¨
-
-1ã€ä½¿ç”¨åŒæ‹¬å·è¡¨ç¤ºä¸€ä¸ªå˜é‡
-{{ name }}
- å¸¸ç”¨å˜é‡è¿‡æ»¤å™¨
-safeï¼šç¦ç”¨è½¬ä¹‰
-capitalizeï¼šæŠŠå˜é‡å€¼çš„é¦–å­—æ¯è½¬æˆå¤§å†™ï¼Œå…¶ä½™å­—æ¯è½¬å°å†™
-lowerï¼šæŠŠå€¼è½¬æˆå°å†™
-upperï¼šæŠŠå€¼è½¬æˆå¤§å†™
-
-2ã€forå¾ªç¯
-{% for comment in comments %}
-        {{ comment }}
-{% endfor %}
-3ã€åˆ¤æ–­
-
-{% if name %}
-    {{ name }}
-{% else %}
-    <p>None</p>
-{% endif %}
-
-4ã€å®šä¹‰å‡½æ•°
-{% macro li(comment) %}
-    <li>{{ comment }}</li>
-{% endmacro %}
-
-4ã€å¯¼å…¥æ¨¡å—
-{{import 'macro.html' as m}}
-ä½¿ç”¨
-{{m.li(name)}}
-å¯¼å…¥å¸¸ç”¨éƒ¨åˆ†
-{% include 'part.html' %}
-5 ã€æ¨¡æ¿ç»§æ‰¿
-çˆ¶æ¨¡æ¿
-{%block title%}Title{%endblock%}
-å­æ¨¡æ¿
-{%extends 'base.html'%}
-{%block title%}
-{{super()}}ç»§æ‰¿çˆ¶ç±»å†…å®¹
-{%endblock%}
-##Bootstrap
+## flask-migrate
 ```
-from flask_bootstrap import Bootstrap
+migrate = Migrate(app, db)
+manager.add_command('db', MigrateCommand)
 
-app = Flask(__name__)
-bootstrap = Bootstrap(app)
 ```
-ç»§æ‰¿bootstrapæ¨¡æ¿
-```
-{% extends 'bootstrap/base.html' %}
-{% block content %}
-    <div class="page-header">
-        <h1>Hello</h1>
-    </div>
-{%endblock%}
-```
-bootstrapå¸¸ç”¨å—å
-title styles body navbar content scripts
-## è‡ªå®šä¹‰é”™è¯¯é¡µé¢
-```
-@app.errorhandler(404)
-def page_not_found(e):
-    abort(500)
-    return render_template('error.html', error=e)
 
-@app.errorhandler(500)
-def page_not_found(e):
-    return render_template('error.html', error=e)
-```
-## é“¾æ¥
-url_for('index', name='Torrent', _external=True)
-æ”¯æŒå‚æ•°ï¼Œå’Œå®Œå…¨url
-## é™æ€é“¾æ¥
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+python manager.py db init ´´½¨²Ö¿â
 
-## flask-moment
-```
-from flask_moment import Moment
-moment = Moment(app)
+python manager.py db migrate -m 'change' ½«¸üĞÂ¼ÓÈë²Ö¿â£¨-m±ØÑ§Ê¹ÓÃ£©
 
-<p>{{ moment(current_time).format('LLL') }}</p>
-    <p>{{ moment(current_time).fromNow(refresh=True) }}</p>
+python manager.py db upgrade ¸üĞÂÊı¾İ¿â
 
-{% block scripts %}
-    {{ super() }}
-    {{ moment.include_moment() }}
-    {{ moment.lang('zh-cn') }}
-{% endblock %}
+## Êı¾İ¿â
+Ê¹ÓÃWerkzeug¼ÓÃÜÃÜÂë
 ```
+>>> from werkzeug.security import generate_password_hash, check_password_hash
+
+>>> passwd = generate_password_hash('password')
+>>> check_password_hash(passwd, 'password')
+True
+>>> passwd
+'pbkdf2:sha256:50000$sDHqvdve$bad3efcbf536aeea149cf88470f2929d5f02b8b159061b01e9310f08eb3834f3'
+```
+ÔÚÊı¾İ¿âÖĞÓ¦ÓÃ(Ò»¶Ô¶à)
+```
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, unique=True)
+    password_hash = db.Column(db.String(128))
+    confirmed = db.Column(db.Boolean, default=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    @property
+    def password(self):
+        raise AttributeError('password is not readable')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def __str__(self):
+        return '<User %r>' % self.username
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    users = db.relationship('User', backref='role')
+```
+
+## flask-login
+
+flask-loginÒªÇóÓÃ»§ÊµÏÖ·½·¨£¬ ¿ÉÖ±½Ó¼Ì³ĞUserMixin
+```
+is_active
+is_authenticated
+is_anonymous
+ get_id  
+
+from flask_login import UserMixin
+class User(UserMixin, db.Model):pass
+```
+flask-loginÔÚ¹¤³§º¯ÊıÖĞ×ö³õÊ¼»¯
+```
+from flask_login import LoginManager
+
+login_manager = LoginManager()
+login_manager.session_protection = 'strong'
+login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+```
+×¢²áÓÃ»§
+```
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+```
+µÇÂ¼µÇ³öÈÏÖ¤
+```
+from . import auth
+from flask import render_template, flash, redirect, url_for, session, request
+from datetime import datetime
+from .forms import LoginForm
+from flask_login import login_user, logout_user
+from ..models import User
+
+
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            login_user(user)
+            flash('login success')
+            return redirect(request.args.get('next') or url_for('main.index'))
+        flash('Invalid username or password')
+    return render_template('auth/index.html', current_time=datetime.utcnow(), form=form)
+
+
+@auth.route('/logout')
+def logout():
+    logout_user()
+    flash('you have already logged out')
+    return redirect(url_for('main.index'))
+
+@main.route('/admin123')
+@login_required
+def admin():
+pass
+```
+
+
+
+  
 
 
 
